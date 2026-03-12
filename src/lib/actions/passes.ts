@@ -11,8 +11,8 @@ import type { PassStatus } from "@/generated/prisma/client";
 export async function generatePassAction(authorizationId: string, dateStr: string) {
   await requireRole("ADMIN", "CASE_MANAGER", "EMPLOYMENT_SPECIALIST");
 
-  const date = new Date(dateStr);
-  date.setHours(0, 0, 0, 0);
+  const [year, month, day] = dateStr.split("-").map(Number);
+  const date = new Date(year, month - 1, day);
 
   const pass = await generatePassForDate(authorizationId, date);
 
@@ -34,10 +34,9 @@ export async function getPasses(params: {
   if (params.status) where.status = params.status;
   if (params.residentId) where.residentId = params.residentId;
   if (params.date) {
-    const d = new Date(params.date);
-    d.setHours(0, 0, 0, 0);
-    const next = new Date(d);
-    next.setDate(next.getDate() + 1);
+    const [y, m, dy] = params.date.split("-").map(Number);
+    const d = new Date(y, m - 1, dy);
+    const next = new Date(y, m - 1, dy + 1);
     where.date = { gte: d, lt: next };
   }
 
