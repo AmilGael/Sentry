@@ -4,6 +4,7 @@ import { requireRole } from "@/lib/auth-utils";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { FrontDeskActions } from "@/components/front-desk-actions";
 import { OfflineCacheManager } from "@/components/offline-cache-manager";
+import { OverdueStatCard, OverdueTimer } from "@/components/overdue-timer";
 
 export default async function FrontDeskPage() {
   await requireRole("ADMIN", "FRONT_DESK");
@@ -44,11 +45,16 @@ export default async function FrontDeskPage() {
         <StatCard label="Scheduled" value={active.length} color="text-blue-400" />
         <StatCard label="Currently Out" value={out.length} color="text-yellow-400" />
         <StatCard label="Returned" value={completed.length} color="text-green-400" />
-        <StatCard
-          label="Overdue"
-          value={overdue.length}
-          color={overdue.length > 0 ? "text-red-400" : "text-gray-500"}
-          flash={overdue.length > 0}
+        <OverdueStatCard
+          count={overdue.length}
+          earliestOverdueSince={
+            overdue.length > 0
+              ? overdue.reduce((earliest, p) =>
+                  p.scheduledReturn < earliest ? p.scheduledReturn : earliest,
+                  overdue[0].scheduledReturn
+                ).toISOString()
+              : null
+          }
         />
       </div>
 
@@ -58,11 +64,7 @@ export default async function FrontDeskPage() {
           <h2 className="text-sm font-semibold text-red-300">
             ⚠ Overdue Returns ({overdue.length})
           </h2>
-          {overdue.map((p) => {
-            const mins = Math.round(
-              (Date.now() - p.scheduledReturn.getTime()) / 60000
-            );
-            return (
+          {overdue.map((p) => (
               <div
                 key={p.id}
                 className="flex items-center justify-between rounded-lg border border-red-900 bg-red-950/50 px-4 py-3"
@@ -80,13 +82,12 @@ export default async function FrontDeskPage() {
                       hour: "2-digit",
                       minute: "2-digit",
                     })}{" "}
-                    · {mins}m overdue
+                    · Overdue by <OverdueTimer since={p.scheduledReturn.toISOString()} />
                   </p>
                 </div>
                 <FrontDeskActions passId={p.id} passStatus={p.status} />
               </div>
-            );
-          })}
+          ))}
         </div>
       )}
 
@@ -143,21 +144,13 @@ function StatCard({
   label,
   value,
   color,
-  flash,
 }: {
   label: string;
   value: number;
   color: string;
-  flash?: boolean;
 }) {
   return (
-    <div
-      className={`rounded-lg border p-4 ${
-        flash
-          ? "animate-overdue-flash border-red-700"
-          : "border-gray-800 bg-gray-950"
-      }`}
-    >
+    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
       <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
       <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
     </div>
