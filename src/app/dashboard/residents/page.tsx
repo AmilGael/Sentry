@@ -13,7 +13,7 @@ export default async function ResidentsPage(props: {
     order?: "asc" | "desc";
   }>;
 }) {
-  await requireRole("ADMIN", "CASE_MANAGER");
+  await requireRole("ADMIN", "CASE_MANAGER", "FRONT_DESK");
   const searchParams = await props.searchParams;
 
   const [residents, caseManagers] = await Promise.all([

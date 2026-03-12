@@ -51,7 +51,7 @@ export async function createResident(
   _prev: ResidentFormState,
   formData: FormData
 ): Promise<ResidentFormState> {
-  await requireRole("ADMIN", "CASE_MANAGER");
+  await requireRole("ADMIN", "CASE_MANAGER", "FRONT_DESK");
 
   const validation = validateResidentForm(formData);
   if (!validation.valid) return validation;
@@ -92,7 +92,7 @@ export async function updateResident(
   _prev: ResidentFormState,
   formData: FormData
 ): Promise<ResidentFormState> {
-  await requireRole("ADMIN", "CASE_MANAGER");
+  await requireRole("ADMIN", "CASE_MANAGER", "FRONT_DESK");
 
   const validation = validateResidentForm(formData);
   if (!validation.valid) return validation;
@@ -138,7 +138,7 @@ export async function updateResidentStatus(
   if (newStatus === "RELEASED") {
     await requireRole("ADMIN");
   } else {
-    await requireRole("ADMIN", "CASE_MANAGER");
+    await requireRole("ADMIN", "CASE_MANAGER", "FRONT_DESK");
   }
 
   await prisma.resident.update({

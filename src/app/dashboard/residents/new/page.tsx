@@ -4,7 +4,7 @@ import { getCaseManagers, createResident } from "@/lib/actions/residents";
 import { ResidentForm } from "@/components/resident-form";
 
 export default async function NewResidentPage() {
-  await requireRole("ADMIN", "CASE_MANAGER");
+  await requireRole("ADMIN", "CASE_MANAGER", "FRONT_DESK");
   const caseManagers = await getCaseManagers();
 
   return (

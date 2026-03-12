@@ -51,6 +51,8 @@ const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
   FRONT_DESK: [
     { label: "Front Desk", href: "/dashboard/front-desk", icon: "🖥️" },
     { label: "Scan Pass", href: "/dashboard/front-desk/scan", icon: "📷" },
+    { label: "Residents", href: "/dashboard/residents", icon: "👤" },
+    { label: "Incidents", href: "/dashboard/incidents", icon: "⚠️" },
   ],
 };
 

@@ -7,7 +7,7 @@ import { ResidentForm } from "@/components/resident-form";
 export default async function EditResidentPage(props: {
   params: Promise<{ id: string }>;
 }) {
-  await requireRole("ADMIN", "CASE_MANAGER");
+  await requireRole("ADMIN", "CASE_MANAGER", "FRONT_DESK");
   const { id } = await props.params;
 
   const [resident, caseManagers] = await Promise.all([
