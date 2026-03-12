@@ -149,6 +149,48 @@ export default function ScanPage() {
                 </div>
               </dl>
 
+              {result.authorization && (
+                <div className="mt-4 rounded-lg border border-gray-800 bg-gray-950/60 p-4 text-sm space-y-2">
+                  <p className="text-xs font-semibold uppercase tracking-wider text-gray-400">
+                    Work Details
+                  </p>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <dt className="text-gray-500">Supervisor / Contact</dt>
+                      <dd className="text-white">{result.authorization.employerContact}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-gray-500">Contact Phone</dt>
+                      <dd className="text-white">{result.authorization.employerPhone}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-gray-500">Job Title</dt>
+                      <dd className="text-white">{result.authorization.jobTitle}</dd>
+                    </div>
+                    <div>
+                      <dt className="text-gray-500">Employment Type</dt>
+                      <dd className="text-white">
+                        {result.authorization.employmentType.replace(/_/g, " ")}
+                      </dd>
+                    </div>
+                    <div>
+                      <dt className="text-gray-500">Transportation</dt>
+                      <dd className="text-white">
+                        {result.authorization.transportationMethod.replace(/_/g, " ")}
+                      </dd>
+                    </div>
+                  </div>
+                  <div className="pt-1">
+                    <Link
+                      href={`/dashboard/authorizations/${result.authorization.id}`}
+                      className="text-xs text-blue-400 hover:text-blue-300 underline"
+                    >
+                      View full authorization (read only)
+                    </Link>
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-3 pt-2">
                 <FrontDeskActions passId={result.pass.id} passStatus={result.pass.status} />
                 <button

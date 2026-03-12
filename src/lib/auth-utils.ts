@@ -24,40 +24,50 @@ type NavItem = {
   icon: string;
 };
 
-const NAV_BY_ROLE: Record<UserRole, NavItem[]> = {
-  ADMIN: [
-    { label: "Dashboard", href: "/dashboard", icon: "📊" },
-    { label: "Residents", href: "/dashboard/residents", icon: "👤" },
-    { label: "Authorizations", href: "/dashboard/authorizations", icon: "📋" },
-    { label: "Passes", href: "/dashboard/passes", icon: "🎫" },
-    { label: "Front Desk", href: "/dashboard/front-desk", icon: "🖥️" },
-    { label: "Incidents", href: "/dashboard/incidents", icon: "⚠️" },
-    { label: "Reports", href: "/dashboard/reports", icon: "📈" },
-    { label: "Users", href: "/dashboard/users", icon: "👥" },
-    { label: "Settings", href: "/dashboard/settings", icon: "⚙️" },
-  ],
-  CASE_MANAGER: [
-    { label: "Dashboard", href: "/dashboard", icon: "📊" },
-    { label: "My Residents", href: "/dashboard/residents", icon: "👤" },
-    { label: "Authorizations", href: "/dashboard/authorizations", icon: "📋" },
-    { label: "Passes", href: "/dashboard/passes", icon: "🎫" },
-    { label: "Incidents", href: "/dashboard/incidents", icon: "⚠️" },
-  ],
-  EMPLOYMENT_SPECIALIST: [
-    { label: "Dashboard", href: "/dashboard", icon: "📊" },
-    { label: "Review Queue", href: "/dashboard/authorizations", icon: "📋" },
-    { label: "Passes", href: "/dashboard/passes", icon: "🎫" },
-  ],
-  FRONT_DESK: [
-    { label: "Front Desk", href: "/dashboard/front-desk", icon: "🖥️" },
-    { label: "Scan Pass", href: "/dashboard/front-desk/scan", icon: "📷" },
-    { label: "Residents", href: "/dashboard/residents", icon: "👤" },
-    { label: "Incidents", href: "/dashboard/incidents", icon: "⚠️" },
-  ],
-};
+export type NavItemWithAccess = NavItem & { disabled: boolean };
 
-export function getNavForRole(role: UserRole): NavItem[] {
-  return NAV_BY_ROLE[role] ?? [];
+// Unified navigation for all roles. Order is:
+// Front Desk, Scan Pass, Residents, Incidents, Notifications, then everything else.
+const ALL_NAV_ITEMS: NavItem[] = [
+  { label: "Front Desk", href: "/dashboard/front-desk", icon: "🖥️" },
+  { label: "Scan Pass", href: "/dashboard/front-desk/scan", icon: "📷" },
+  { label: "Residents", href: "/dashboard/residents", icon: "👤" },
+  { label: "Incidents", href: "/dashboard/incidents", icon: "⚠️" },
+  { label: "Notifications", href: "/dashboard/notifications", icon: "🔔" },
+  { label: "Dashboard", href: "/dashboard", icon: "📊" },
+  { label: "Authorizations", href: "/dashboard/authorizations", icon: "📋" },
+  { label: "Passes", href: "/dashboard/passes", icon: "🎫" },
+  { label: "Reports", href: "/dashboard/reports", icon: "📈" },
+  { label: "Users", href: "/dashboard/users", icon: "👥" },
+  { label: "Settings", href: "/dashboard/settings", icon: "⚙️" },
+];
+
+const FRONT_DESK_ALLOWED = new Set<string>([
+  "/dashboard/front-desk",
+  "/dashboard/front-desk/scan",
+  "/dashboard/residents",
+  "/dashboard/incidents",
+  "/dashboard/notifications",
+  "/dashboard/authorizations",
+  "/dashboard/passes",
+]);
+
+export function getNavForRole(role: UserRole): NavItemWithAccess[] {
+  // Admins, Case Managers, and Employment Specialists see all items active.
+  if (role === "ADMIN" || role === "CASE_MANAGER" || role === "EMPLOYMENT_SPECIALIST") {
+    return ALL_NAV_ITEMS.map((item) => ({ ...item, disabled: false }));
+  }
+
+  // Front Desk sees everything, but only some entries are active.
+  if (role === "FRONT_DESK") {
+    return ALL_NAV_ITEMS.map((item) => ({
+      ...item,
+      disabled: !FRONT_DESK_ALLOWED.has(item.href),
+    }));
+  }
+
+  // Fallback: everything disabled (shouldn't normally happen).
+  return ALL_NAV_ITEMS.map((item) => ({ ...item, disabled: true }));
 }
 
 const ROLE_DISPLAY_NAMES: Record<UserRole, string> = {

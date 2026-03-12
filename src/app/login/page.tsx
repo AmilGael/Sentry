@@ -1,12 +1,13 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { loginAction } from "@/lib/actions/auth";
 
 export default function LoginPage() {
   const [state, formAction, isPending] = useActionState(loginAction, {
     error: null,
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-gray-950 px-4">
@@ -39,6 +40,7 @@ export default function LoginPage() {
               autoComplete="email"
               required
               className="mt-1 block w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2.5 text-white placeholder-gray-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
+              defaultValue="fd.jackson@reentry.local"
               placeholder="you@reentry.local"
             />
           </div>
@@ -50,15 +52,25 @@ export default function LoginPage() {
             >
               Password
             </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              autoComplete="current-password"
-              required
-              className="mt-1 block w-full rounded-lg border border-gray-700 bg-gray-900 px-4 py-2.5 text-white placeholder-gray-500 focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
-              placeholder="••••••••••"
-            />
+            <div className="mt-1 flex items-center rounded-lg border border-gray-700 bg-gray-900 px-3 py-1.5 focus-within:border-white focus-within:ring-1 focus-within:ring-white">
+              <input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                autoComplete="current-password"
+                required
+                className="w-full bg-transparent px-1 py-1.5 text-sm text-white placeholder-gray-500 focus:outline-none"
+                defaultValue="Password123!"
+                placeholder="••••••••••"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="ml-2 text-xs font-medium text-gray-400 hover:text-gray-200"
+              >
+                {showPassword ? "Hide" : "Show"}
+              </button>
+            </div>
           </div>
 
           <button

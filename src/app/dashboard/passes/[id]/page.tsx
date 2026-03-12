@@ -20,6 +20,7 @@ export default async function PassDetailPage(props: {
   const canCancel =
     pass.status === "ACTIVE" &&
     ["ADMIN", "CASE_MANAGER", "EMPLOYMENT_SPECIALIST"].includes(session.user.role);
+  const isFrontDesk = session.user.role === "FRONT_DESK";
 
   return (
     <div className="space-y-8">
@@ -51,6 +52,12 @@ export default async function PassDetailPage(props: {
             )}
           </div>
         </div>
+        {isFrontDesk && (
+          <p className="mt-2 text-xs text-gray-500">
+            Read-only view for Front Desk. Contact a Case Manager, Employment Specialist, or
+            Administrator to change or cancel this pass.
+          </p>
+        )}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

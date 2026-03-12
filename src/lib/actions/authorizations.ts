@@ -6,6 +6,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { AuthorizationStatus } from "@/generated/prisma/client";
 import { generatePassesForAuthorization } from "@/lib/pass-engine";
+import { signCanonical } from "@/lib/crypto";
 
 // ─── Types ───
 
@@ -13,6 +14,72 @@ export type AuthFormState = {
   error: string | null;
   fieldErrors: Record<string, string>;
 };
+
+function buildAuthorizationSignaturePayload(auth: {
+  id: string;
+  status: AuthorizationStatus;
+  employerName: string;
+  employerAddress: string;
+  employerPhone: string;
+  employerContact: string;
+  jobTitle: string;
+  employmentType: string;
+  scheduleType: string;
+  scheduleStartDate: Date;
+  scheduleEndDate: Date | null;
+  scheduleDays: string[];
+  departureTime: string;
+  returnTime: string;
+  travelBufferMin: number;
+  transportationMethod: string;
+  transportationDetails: string | null;
+  supportingDocuments: string | null;
+  caseManagerNotes: string | null;
+  selfApprovedByCM: boolean;
+  selfApprovalJustification: string | null;
+  selfApprovalTimestamp: Date | null;
+  esRatifiedAt: Date | null;
+  esRatifiedById: string | null;
+  requestedById: string;
+  resident: {
+    id: string;
+    inmateNumber: string;
+    firstName: string;
+    lastName: string;
+  };
+}): Record<string, string> {
+  return {
+    authorizationId: auth.id,
+    status: auth.status,
+    employerName: auth.employerName,
+    employerAddress: auth.employerAddress,
+    employerPhone: auth.employerPhone,
+    employerContact: auth.employerContact,
+    jobTitle: auth.jobTitle,
+    employmentType: auth.employmentType,
+    scheduleType: auth.scheduleType,
+    scheduleStartDate: auth.scheduleStartDate.toISOString(),
+    scheduleEndDate: auth.scheduleEndDate ? auth.scheduleEndDate.toISOString() : "",
+    scheduleDays: [...auth.scheduleDays].sort().join(","),
+    departureTime: auth.departureTime,
+    returnTime: auth.returnTime,
+    travelBufferMin: String(auth.travelBufferMin),
+    transportationMethod: auth.transportationMethod,
+    transportationDetails: auth.transportationDetails ?? "",
+    supportingDocuments: auth.supportingDocuments ?? "",
+    caseManagerNotes: auth.caseManagerNotes ?? "",
+    selfApprovedByCM: String(auth.selfApprovedByCM),
+    selfApprovalJustification: auth.selfApprovalJustification ?? "",
+    selfApprovalTimestamp: auth.selfApprovalTimestamp ? auth.selfApprovalTimestamp.toISOString() : "",
+    esRatifiedAt: auth.esRatifiedAt ? auth.esRatifiedAt.toISOString() : "",
+    esRatifiedById: auth.esRatifiedById ?? "",
+    requestedById: auth.requestedById,
+    residentId: auth.resident.id,
+    inmateNumber: auth.resident.inmateNumber,
+    residentName: `${auth.resident.firstName} ${auth.resident.lastName}`,
+    signatureVersion: "1",
+  };
+}
 
 // ─── Create Authorization (Case Manager) ───
 
@@ -179,6 +246,29 @@ export async function selfApproveAuthorization(
         selfApprovalJustification: formData.get("selfApprovalJustification") as string,
         selfApprovalTimestamp: new Date(),
       },
+      include: {
+        resident: {
+          select: {
+            id: true,
+            inmateNumber: true,
+            firstName: true,
+            lastName: true,
+          },
+        },
+      },
+    });
+
+    const signaturePayload = buildAuthorizationSignaturePayload({
+      ...auth,
+      resident: auth.resident,
+    });
+    const signature = signCanonical(signaturePayload);
+    await prisma.employmentAuthorization.update({
+      where: { id: auth.id },
+      data: {
+        authorizationSignature: signature,
+        authorizationSignatureVersion: 1,
+      },
     });
 
     // Notify Employment Specialists
@@ -231,7 +321,35 @@ export async function approveAuthorization(id: string) {
       status: "APPROVED",
       reviewedById: session.user.id,
     },
-    include: { requestedBy: { select: { id: true } }, resident: { select: { firstName: true, lastName: true } } },
+    include: {
+      requestedBy: { select: { id: true } },
+      resident: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          inmateNumber: true,
+        },
+      },
+    },
+  });
+
+  const signaturePayload = buildAuthorizationSignaturePayload({
+    ...auth,
+    resident: {
+      id: auth.resident.id,
+      inmateNumber: auth.resident.inmateNumber,
+      firstName: auth.resident.firstName,
+      lastName: auth.resident.lastName,
+    },
+  });
+  const signature = signCanonical(signaturePayload);
+  await prisma.employmentAuthorization.update({
+    where: { id },
+    data: {
+      authorizationSignature: signature,
+      authorizationSignatureVersion: 1,
+    },
   });
 
   await prisma.notification.create({
@@ -295,7 +413,35 @@ export async function ratifyAuthorization(id: string) {
       esRatifiedById: session.user.id,
       esRatifiedAt: new Date(),
     },
-    include: { requestedBy: { select: { id: true } }, resident: { select: { firstName: true, lastName: true } } },
+    include: {
+      requestedBy: { select: { id: true } },
+      resident: {
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          inmateNumber: true,
+        },
+      },
+    },
+  });
+
+  const signaturePayload = buildAuthorizationSignaturePayload({
+    ...auth,
+    resident: {
+      id: auth.resident.id,
+      inmateNumber: auth.resident.inmateNumber,
+      firstName: auth.resident.firstName,
+      lastName: auth.resident.lastName,
+    },
+  });
+  const signature = signCanonical(signaturePayload);
+  await prisma.employmentAuthorization.update({
+    where: { id },
+    data: {
+      authorizationSignature: signature,
+      authorizationSignatureVersion: 1,
+    },
   });
 
   await prisma.notification.create({

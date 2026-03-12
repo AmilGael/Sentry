@@ -3,6 +3,7 @@ import { auth } from "@/lib/auth";
 import { getNavForRole, getRoleDisplayName } from "@/lib/auth-utils";
 import { getUnreadCount } from "@/lib/actions/notifications";
 import { LogoutButton } from "@/components/logout-button";
+import { SidebarNav } from "@/components/sidebar-nav";
 
 export async function Sidebar() {
   const session = await auth();
@@ -21,35 +22,7 @@ export async function Sidebar() {
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 py-4">
-        <ul className="space-y-1">
-          {navItems.map((item) => (
-            <li key={item.href}>
-              <Link
-                href={item.href}
-                className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
-              >
-                <span className="text-base">{item.icon}</span>
-                {item.label}
-              </Link>
-            </li>
-          ))}
-
-          {/* Notifications */}
-          <li>
-            <Link
-              href="/dashboard/notifications"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
-            >
-              <span className="text-base">🔔</span>
-              Notifications
-              {unreadCount > 0 && (
-                <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">
-                  {unreadCount > 99 ? "99+" : unreadCount}
-                </span>
-              )}
-            </Link>
-          </li>
-        </ul>
+        <SidebarNav items={navItems} unreadCount={unreadCount} />
       </nav>
 
       <div className="border-t border-gray-800 px-4 py-4">

@@ -214,6 +214,10 @@ model EmploymentAuthorization {
   selfApprovalTimestamp      DateTime?
   esRatifiedAt               DateTime?
 
+  // Tamper-evident snapshot signature
+  authorizationSignature        String?
+  authorizationSignatureVersion Int?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -338,6 +342,8 @@ model IncidentReport {
 model FacilityConfiguration {
   id                        String  @id @default(cuid())
   facilityName              String  @default("Re-Entry Facility")
+  facilityAddress           String  @default("123 Main Street, Your City, ST 00000")
+  facilityPhone             String  @default("(555) 000-0000")
   overdueThresholdMinutes   Int     @default(15)
   awolThresholdMinutes      Int     @default(120)
   passGenerationTime        String  @default("22:00")

@@ -48,8 +48,8 @@ export default async function FrontDeskPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
-        <StatCard label="Scheduled" value={active.length} color="text-blue-400" />
-        <StatCard label="Currently Out" value={out.length - returningSoon.length - overdue.length} color="text-white" />
+        <StatCard label="Scheduled" value={active.length} color="text-white" />
+        <StatCard label="Currently Out" value={out.length - returningSoon.length - overdue.length} color="text-blue-400" />
         <StatCard label="Returning Soon" value={returningSoon.length} color="text-yellow-400" />
         <StatCard label="Returned" value={completed.length} color="text-green-400" />
         <OverdueStatCard
@@ -115,7 +115,7 @@ export default async function FrontDeskPage() {
       {/* Currently Out */}
       {out.filter((p) => !overdue.includes(p) && !returningSoon.includes(p)).length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">
+          <h2 className="text-lg font-semibold text-blue-400">
             Currently Out ({out.filter((p) => !overdue.includes(p) && !returningSoon.includes(p)).length})
           </h2>
           <div className="space-y-2">

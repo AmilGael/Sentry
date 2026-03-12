@@ -71,24 +71,41 @@ export default async function PublicPassPage(props: {
         {/* Pass Info */}
         <div className="rounded-xl border border-gray-800 bg-gray-900 p-5 space-y-4">
           <div className="text-center">
-            <p className="text-lg font-bold text-white">{pass.residentFullName}</p>
+            <p className "text-lg font-bold text-white">{pass.residentFullName}</p>
             <p className="text-sm text-gray-400">{pass.residentInmateNumber}</p>
           </div>
 
           <div className="h-px bg-gray-800" />
 
+          {/* From / To */}
+          <div className="space-y-3 text-sm">
+            <div>
+              <p className="text-gray-500 text-xs uppercase tracking-wider">From (Facility)</p>
+              <p className="text-white font-medium">Re-Entry Facility</p>
+              <p className="text-gray-400 text-xs">
+                This facility&apos;s full address and phone will be displayed here in a future update.
+              </p>
+            </div>
+            <div>
+              <p className="text-gray-500 text-xs uppercase tracking-wider">To (Work Site)</p>
+              <p className="text-white font-medium">{pass.employerName}</p>
+              <p className="text-gray-300 text-xs">{pass.authorization?.employerAddress ?? ""}</p>
+            </div>
+          </div>
+
+          <div className="h-px bg-gray-800" />
+
+          {/* Times */}
           <div className="grid grid-cols-2 gap-3 text-sm">
             <div>
-              <p className="text-gray-500">Employer</p>
-              <p className="text-white font-medium">{pass.employerName}</p>
-            </div>
-            <div>
-              <p className="text-gray-500">Type</p>
-              <p className="text-white font-medium">{pass.passType.replace(/_/g, " ")}</p>
-            </div>
-            <div>
               <p className="text-gray-500">Date</p>
-              <p className="text-white font-medium">{pass.date.toLocaleDateString()}</p>
+              <p className="text-white font-medium">
+                {pass.date.toLocaleDateString("en-US", {
+                  month: "2-digit",
+                  day: "2-digit",
+                  year: "numeric",
+                })}
+              </p>
             </div>
             <div>
               <p className="text-gray-500">Status</p>

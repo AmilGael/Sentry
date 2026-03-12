@@ -11,6 +11,7 @@ export type VerifyResult = {
   valid: boolean;
   pass?: {
     id: string;
+    authorizationId: string;
     passDisplayId: string;
     residentFullName: string;
     residentInmateNumber: string;
@@ -23,6 +24,14 @@ export type VerifyResult = {
     actualDeparture: Date | null;
     actualReturn: Date | null;
     status: string;
+  };
+  authorization?: {
+    id: string;
+    employerPhone: string;
+    employerContact: string;
+    jobTitle: string;
+    employmentType: string;
+    transportationMethod: string;
   };
   error?: string;
 };
@@ -54,6 +63,18 @@ export async function verifyQRCode(qrData: string): Promise<VerifyResult> {
 
   const pass = await prisma.movementPass.findUnique({
     where: { passDisplayId: parsed.pid },
+    include: {
+      authorization: {
+        select: {
+          id: true,
+          employerPhone: true,
+          employerContact: true,
+          jobTitle: true,
+          employmentType: true,
+          transportationMethod: true,
+        },
+      },
+    },
   });
 
   if (!pass) {
@@ -64,11 +85,64 @@ export async function verifyQRCode(qrData: string): Promise<VerifyResult> {
     return {
       valid: false,
       error: `Pass is ${pass.status.toLowerCase()} — cannot be used`,
-      pass,
+      pass: {
+        id: pass.id,
+        authorizationId: pass.authorizationId,
+        passDisplayId: pass.passDisplayId,
+        residentFullName: pass.residentFullName,
+        residentInmateNumber: pass.residentInmateNumber,
+        employerName: pass.employerName,
+        employerAddress: pass.employerAddress,
+        passType: pass.passType,
+        date: pass.date,
+        scheduledDeparture: pass.scheduledDeparture,
+        scheduledReturn: pass.scheduledReturn,
+        actualDeparture: pass.actualDeparture,
+        actualReturn: pass.actualReturn,
+        status: pass.status,
+      },
+      authorization: pass.authorization
+        ? {
+            id: pass.authorization.id,
+            employerPhone: pass.authorization.employerPhone,
+            employerContact: pass.authorization.employerContact,
+            jobTitle: pass.authorization.jobTitle,
+            employmentType: pass.authorization.employmentType,
+            transportationMethod: pass.authorization.transportationMethod,
+          }
+        : undefined,
     };
   }
 
-  return { valid: true, pass };
+  return {
+    valid: true,
+    pass: {
+      id: pass.id,
+      authorizationId: pass.authorizationId,
+      passDisplayId: pass.passDisplayId,
+      residentFullName: pass.residentFullName,
+      residentInmateNumber: pass.residentInmateNumber,
+      employerName: pass.employerName,
+      employerAddress: pass.employerAddress,
+      passType: pass.passType,
+      date: pass.date,
+      scheduledDeparture: pass.scheduledDeparture,
+      scheduledReturn: pass.scheduledReturn,
+      actualDeparture: pass.actualDeparture,
+      actualReturn: pass.actualReturn,
+      status: pass.status,
+    },
+    authorization: pass.authorization
+      ? {
+          id: pass.authorization.id,
+          employerPhone: pass.authorization.employerPhone,
+          employerContact: pass.authorization.employerContact,
+          jobTitle: pass.authorization.jobTitle,
+          employmentType: pass.authorization.employmentType,
+          transportationMethod: pass.authorization.transportationMethod,
+        }
+      : undefined,
+  };
 }
 
 // ─── Manual Lookup ───
@@ -90,7 +164,47 @@ export async function lookupPass(query: string): Promise<VerifyResult> {
     return { valid: false, error: "No pass found for that ID or inmate number" };
   }
 
-  return { valid: true, pass };
+  const auth = await prisma.employmentAuthorization.findUnique({
+    where: { id: pass.authorizationId },
+    select: {
+      id: true,
+      employerPhone: true,
+      employerContact: true,
+      jobTitle: true,
+      employmentType: true,
+      transportationMethod: true,
+    },
+  });
+
+  return {
+    valid: true,
+    pass: {
+      id: pass.id,
+      authorizationId: pass.authorizationId,
+      passDisplayId: pass.passDisplayId,
+      residentFullName: pass.residentFullName,
+      residentInmateNumber: pass.residentInmateNumber,
+      employerName: pass.employerName,
+      employerAddress: pass.employerAddress,
+      passType: pass.passType,
+      date: pass.date,
+      scheduledDeparture: pass.scheduledDeparture,
+      scheduledReturn: pass.scheduledReturn,
+      actualDeparture: pass.actualDeparture,
+      actualReturn: pass.actualReturn,
+      status: pass.status,
+    },
+    authorization: auth
+      ? {
+          id: auth.id,
+          employerPhone: auth.employerPhone,
+          employerContact: auth.employerContact,
+          jobTitle: auth.jobTitle,
+          employmentType: auth.employmentType,
+          transportationMethod: auth.transportationMethod,
+        }
+      : undefined,
+  };
 }
 
 // ─── Check Out (DEPARTURE) ───

@@ -42,7 +42,10 @@ export async function getPasses(params: {
 
   return prisma.movementPass.findMany({
     where,
-    orderBy: { date: "desc" },
+    orderBy: [
+      { date: "asc" },
+      { scheduledDeparture: "asc" },
+    ],
     include: {
       authorization: { select: { id: true, employerName: true } },
     },
@@ -69,6 +72,13 @@ export async function getPass(id: string) {
 export async function getPassByToken(passId: string) {
   return prisma.movementPass.findUnique({
     where: { id: passId },
+    include: {
+      authorization: {
+        select: {
+          employerAddress: true,
+        },
+      },
+    },
   });
 }
 
