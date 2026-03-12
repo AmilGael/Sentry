@@ -82,6 +82,6 @@ npm run db:reset      # Reset DB and re-seed
 | 6     | QR code generation and pass delivery                     | ✅ Complete |
 | 7     | Front Desk dashboard with QR scanning & offline fallback | ✅ Complete |
 | 8     | Incident reporting (automatic and manual)                | ✅ Complete |
-| 9     | Reporting and analytics                                  | Pending     |
+| 9     | Reporting and analytics                                  | ✅ Complete |
 | 10    | Admin configuration panel                                | Pending     |
 | 11    | Polish, accessibility audit, performance optimization    | Pending     |
