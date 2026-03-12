@@ -48,14 +48,15 @@ export default async function FrontDeskPage() {
           label="Overdue"
           value={overdue.length}
           color={overdue.length > 0 ? "text-red-400" : "text-gray-500"}
+          flash={overdue.length > 0}
         />
       </div>
 
       {/* Overdue Alert */}
       {overdue.length > 0 && (
-        <div className="rounded-lg border border-red-800 bg-red-950/30 p-4 space-y-3">
+        <div className="animate-overdue-flash rounded-lg border border-red-800 p-4 space-y-3">
           <h2 className="text-sm font-semibold text-red-300">
-            Overdue Returns ({overdue.length})
+            ⚠ Overdue Returns ({overdue.length})
           </h2>
           {overdue.map((p) => {
             const mins = Math.round(
@@ -142,13 +143,21 @@ function StatCard({
   label,
   value,
   color,
+  flash,
 }: {
   label: string;
   value: number;
   color: string;
+  flash?: boolean;
 }) {
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-950 p-4">
+    <div
+      className={`rounded-lg border p-4 ${
+        flash
+          ? "animate-overdue-flash border-red-700"
+          : "border-gray-800 bg-gray-950"
+      }`}
+    >
       <p className="text-xs text-gray-500 uppercase tracking-wider">{label}</p>
       <p className={`mt-1 text-3xl font-bold ${color}`}>{value}</p>
     </div>
