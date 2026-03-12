@@ -10,10 +10,16 @@ export default async function FrontDeskPage() {
   await requireRole("ADMIN", "FRONT_DESK");
   const passes = await getTodaysPasses();
 
+  const now = new Date();
+  const soonThreshold = new Date(now.getTime() + 60 * 60 * 1000);
+
   const active = passes.filter((p) => p.status === "ACTIVE");
   const out = passes.filter((p) => p.status === "USED");
   const completed = passes.filter((p) => p.status === "COMPLETED");
-  const overdue = out.filter((p) => p.scheduledReturn < new Date());
+  const overdue = out.filter((p) => p.scheduledReturn < now);
+  const returningSoon = out.filter(
+    (p) => p.scheduledReturn >= now && p.scheduledReturn <= soonThreshold
+  );
 
   return (
     <div className="space-y-6">
@@ -41,9 +47,10 @@ export default async function FrontDeskPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatCard label="Scheduled" value={active.length} color="text-blue-400" />
-        <StatCard label="Currently Out" value={out.length} color="text-yellow-400" />
+        <StatCard label="Currently Out" value={out.length - returningSoon.length} color="text-white" />
+        <StatCard label="Returning Soon" value={returningSoon.length} color="text-yellow-400" />
         <StatCard label="Returned" value={completed.length} color="text-green-400" />
         <OverdueStatCard
           count={overdue.length}
@@ -91,13 +98,29 @@ export default async function FrontDeskPage() {
         </div>
       )}
 
-      {/* Currently Out */}
-      {out.length > 0 && (
+      {/* Returning Soon */}
+      {returningSoon.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">Currently Out ({out.length})</h2>
+          <h2 className="text-lg font-semibold text-yellow-400">
+            Returning Soon ({returningSoon.length})
+          </h2>
+          <div className="space-y-2">
+            {returningSoon.map((p) => (
+              <PassRow key={p.id} pass={p} highlight="yellow" />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* Currently Out */}
+      {out.filter((p) => !overdue.includes(p) && !returningSoon.includes(p)).length > 0 && (
+        <section className="space-y-3">
+          <h2 className="text-lg font-semibold text-white">
+            Currently Out ({out.filter((p) => !overdue.includes(p) && !returningSoon.includes(p)).length})
+          </h2>
           <div className="space-y-2">
             {out
-              .filter((p) => !overdue.includes(p))
+              .filter((p) => !overdue.includes(p) && !returningSoon.includes(p))
               .map((p) => (
                 <PassRow key={p.id} pass={p} />
               ))}
@@ -159,6 +182,7 @@ function StatCard({
 
 function PassRow({
   pass,
+  highlight,
 }: {
   pass: {
     id: string;
@@ -172,9 +196,15 @@ function PassRow({
     actualReturn: Date | null;
     status: string;
   };
+  highlight?: "yellow";
 }) {
+  const borderColor =
+    highlight === "yellow"
+      ? "border-yellow-600 bg-yellow-950/40"
+      : "border-gray-800 bg-gray-950";
+
   return (
-    <div className="flex items-center justify-between rounded-lg border border-gray-800 bg-gray-950 px-4 py-3">
+    <div className={`flex items-center justify-between rounded-lg border px-4 py-3 ${borderColor}`}>
       <div className="min-w-0 flex-1">
         <div className="flex items-center gap-3">
           <p className="text-sm font-medium text-white">{pass.residentFullName}</p>
