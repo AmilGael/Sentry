@@ -49,7 +49,7 @@ export default async function FrontDeskPage() {
       {/* Stats */}
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-5">
         <StatCard label="Scheduled" value={active.length} color="text-blue-400" />
-        <StatCard label="Currently Out" value={out.length - returningSoon.length} color="text-white" />
+        <StatCard label="Currently Out" value={out.length - returningSoon.length - overdue.length} color="text-white" />
         <StatCard label="Returning Soon" value={returningSoon.length} color="text-yellow-400" />
         <StatCard label="Returned" value={completed.length} color="text-green-400" />
         <OverdueStatCard
