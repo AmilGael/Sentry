@@ -4,6 +4,7 @@ import { getAuthorization } from "@/lib/actions/authorizations";
 import { getSession } from "@/lib/auth-utils";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { AuthorizationActions } from "@/components/authorization-actions";
+import { GeneratePassButton } from "@/components/generate-pass-button";
 
 const DAY_SHORT: Record<string, string> = {
   MONDAY: "Mon", TUESDAY: "Tue", WEDNESDAY: "Wed",
@@ -165,17 +166,30 @@ export default async function AuthorizationDetailPage(props: {
 
         {/* Generated Passes */}
         <section className="rounded-lg border border-gray-800 bg-gray-950 p-6 space-y-4">
-          <h2 className="text-lg font-semibold text-white">Generated Passes</h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-lg font-semibold text-white">Generated Passes</h2>
+            <Link href="/dashboard/passes" className="text-xs text-gray-400 hover:text-white transition-colors">
+              View all passes →
+            </Link>
+          </div>
+          {["APPROVED", "CM_SELF_APPROVED", "ES_RATIFIED", "ACTIVE"].includes(auth.status) &&
+           ["ADMIN", "CASE_MANAGER", "EMPLOYMENT_SPECIALIST"].includes(session.user.role) && (
+            <GeneratePassButton authorizationId={id} />
+          )}
           {auth.passes.length === 0 ? (
             <p className="text-sm text-gray-500">No passes generated yet.</p>
           ) : (
             <div className="space-y-2">
               {auth.passes.map((p) => (
-                <div key={p.id} className="flex items-center justify-between rounded-lg border border-gray-800 px-3 py-2">
+                <Link
+                  key={p.id}
+                  href={`/dashboard/passes/${p.id}`}
+                  className="flex items-center justify-between rounded-lg border border-gray-800 px-3 py-2 hover:bg-gray-800/50 transition-colors"
+                >
                   <span className="text-sm text-gray-300">{p.passDisplayId}</span>
                   <span className="text-xs text-gray-400">{p.date.toLocaleDateString()}</span>
                   <StatusBadge status={p.status} />
-                </div>
+                </Link>
               ))}
             </div>
           )}

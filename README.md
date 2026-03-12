@@ -10,7 +10,7 @@ See **Re-Entry_PRD.md** for the full product requirements document.
 - **Styling:** Tailwind CSS 4
 - **Database:** PostgreSQL 15+
 - **ORM:** Prisma 7
-- **Auth:** NextAuth.js (planned — Phase 2)
+- **Auth:** NextAuth.js (Auth.js v5)
 - **Real-Time:** WebSocket (planned — Phase 7)
 - **Crypto:** Node.js `crypto` module (HMAC-SHA256)
 
@@ -75,11 +75,11 @@ npm run db:reset      # Reset DB and re-seed
 | Phase | Description                                              | Status      |
 |-------|----------------------------------------------------------|-------------|
 | 1     | Project scaffold, database schema, seed data             | ✅ Complete |
-| 2     | Authentication with role-based access                    | Pending     |
-| 3     | Resident management (CRUD, status tracking)              | Pending     |
-| 4     | Employment authorization workflow                        | Pending     |
-| 5     | Movement pass generation with HMAC-SHA256 signing        | Pending     |
-| 6     | QR code generation and pass delivery                     | Pending     |
+| 2     | Authentication with role-based access                    | ✅ Complete |
+| 3     | Resident management (CRUD, status tracking)              | ✅ Complete |
+| 4     | Employment authorization workflow                        | ✅ Complete |
+| 5     | Movement pass generation, QR codes, HMAC signing         | ✅ Complete |
+| 6     | QR code generation and pass delivery                     | ✅ Complete |
 | 7     | Front Desk dashboard with real-time updates              | Pending     |
 | 8     | Incident reporting (automatic and manual)                | Pending     |
 | 9     | Reporting and analytics                                  | Pending     |

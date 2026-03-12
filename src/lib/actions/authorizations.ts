@@ -5,6 +5,7 @@ import { getSession, requireRole } from "@/lib/auth-utils";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import type { AuthorizationStatus } from "@/generated/prisma/client";
+import { generatePassesForAuthorization } from "@/lib/pass-engine";
 
 // ─── Types ───
 
@@ -203,11 +204,19 @@ export async function selfApproveAuthorization(
         })),
       });
     }
+
+    // Auto-generate passes for self-approved auth (emergency use)
+    try {
+      await generatePassesForAuthorization(auth.id);
+    } catch {
+      // Non-blocking
+    }
   } catch {
     return { error: "Failed to create self-approved authorization.", fieldErrors: {} };
   }
 
   revalidatePath("/dashboard/authorizations");
+  revalidatePath("/dashboard/passes");
   redirect("/dashboard/authorizations");
 }
 
@@ -236,8 +245,16 @@ export async function approveAuthorization(id: string) {
     },
   });
 
+  // Auto-generate passes upon approval
+  try {
+    await generatePassesForAuthorization(id);
+  } catch {
+    // Non-blocking — passes can be generated manually later
+  }
+
   revalidatePath(`/dashboard/authorizations/${id}`);
   revalidatePath("/dashboard/authorizations");
+  revalidatePath("/dashboard/passes");
 }
 
 export async function denyAuthorization(id: string, reason: string) {
@@ -292,8 +309,16 @@ export async function ratifyAuthorization(id: string) {
     },
   });
 
+  // Auto-generate passes upon ratification
+  try {
+    await generatePassesForAuthorization(id);
+  } catch {
+    // Non-blocking
+  }
+
   revalidatePath(`/dashboard/authorizations/${id}`);
   revalidatePath("/dashboard/authorizations");
+  revalidatePath("/dashboard/passes");
 }
 
 export async function revokeAuthorization(id: string, reason: string) {
