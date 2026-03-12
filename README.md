@@ -83,5 +83,5 @@ npm run db:reset      # Reset DB and re-seed
 | 7     | Front Desk dashboard with QR scanning & offline fallback | ✅ Complete |
 | 8     | Incident reporting (automatic and manual)                | ✅ Complete |
 | 9     | Reporting and analytics                                  | ✅ Complete |
-| 10    | Admin configuration panel                                | Pending     |
+| 10    | Admin config, user management, notifications             | ✅ Complete |
 | 11    | Polish, accessibility audit, performance optimization    | Pending     |

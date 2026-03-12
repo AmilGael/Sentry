@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { auth } from "@/lib/auth";
 import { getNavForRole, getRoleDisplayName } from "@/lib/auth-utils";
+import { getUnreadCount } from "@/lib/actions/notifications";
 import { LogoutButton } from "@/components/logout-button";
 
 export async function Sidebar() {
@@ -9,6 +10,7 @@ export async function Sidebar() {
 
   const navItems = getNavForRole(session.user.role);
   const roleLabel = getRoleDisplayName(session.user.role);
+  const unreadCount = await getUnreadCount();
 
   return (
     <aside className="flex h-screen w-64 flex-col border-r border-gray-800 bg-gray-950">
@@ -31,6 +33,22 @@ export async function Sidebar() {
               </Link>
             </li>
           ))}
+
+          {/* Notifications */}
+          <li>
+            <Link
+              href="/dashboard/notifications"
+              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-gray-300 hover:bg-gray-800 hover:text-white transition-colors"
+            >
+              <span className="text-base">🔔</span>
+              Notifications
+              {unreadCount > 0 && (
+                <span className="ml-auto inline-flex h-5 min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 text-xs font-bold text-white">
+                  {unreadCount > 99 ? "99+" : unreadCount}
+                </span>
+              )}
+            </Link>
+          </li>
         </ul>
       </nav>
 
