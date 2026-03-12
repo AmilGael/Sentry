@@ -69,7 +69,17 @@ export default async function FrontDeskPage() {
                 <div>
                   <p className="text-sm font-medium text-white">{p.residentFullName}</p>
                   <p className="text-xs text-red-400">
-                    {p.residentInmateNumber} · {p.employerName} · {mins}m overdue
+                    {p.residentInmateNumber} · {p.employerName} · Due back{" "}
+                    {p.scheduledReturn.toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}{" "}
+                    {p.scheduledReturn.toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}{" "}
+                    · {mins}m overdue
                   </p>
                 </div>
                 <FrontDeskActions passId={p.id} passStatus={p.status} />
@@ -170,11 +180,21 @@ function PassRow({
         </div>
         <p className="mt-0.5 text-xs text-gray-400">
           {pass.residentInmateNumber} · {pass.employerName} ·{" "}
+          {pass.scheduledDeparture.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric",
+          })}{" "}
           {pass.scheduledDeparture.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
           })}
-          –
+          {" "}–{" "}
+          {pass.scheduledReturn.toLocaleDateString("en-US", {
+            month: "2-digit",
+            day: "2-digit",
+            year: "numeric",
+          })}{" "}
           {pass.scheduledReturn.toLocaleTimeString([], {
             hour: "2-digit",
             minute: "2-digit",
@@ -183,12 +203,21 @@ function PassRow({
         {pass.actualDeparture && (
           <p className="text-xs text-gray-500">
             Left:{" "}
+            {pass.actualDeparture.toLocaleDateString("en-US", {
+              month: "2-digit",
+              day: "2-digit",
+              year: "numeric",
+            })}{" "}
             {pass.actualDeparture.toLocaleTimeString([], {
               hour: "2-digit",
               minute: "2-digit",
             })}
             {pass.actualReturn &&
-              ` · Returned: ${pass.actualReturn.toLocaleTimeString([], {
+              ` · Returned: ${pass.actualReturn.toLocaleDateString("en-US", {
+                month: "2-digit",
+                day: "2-digit",
+                year: "numeric",
+              })} ${pass.actualReturn.toLocaleTimeString([], {
                 hour: "2-digit",
                 minute: "2-digit",
               })}`}

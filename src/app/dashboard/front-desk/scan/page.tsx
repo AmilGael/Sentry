@@ -114,6 +114,11 @@ export default function ScanPage() {
                 <div>
                   <dt className="text-gray-500">Departure</dt>
                   <dd className="text-white text-lg font-bold">
+                    {result.pass.scheduledDeparture.toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}{" "}
                     {result.pass.scheduledDeparture.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
@@ -123,6 +128,11 @@ export default function ScanPage() {
                 <div>
                   <dt className="text-gray-500">Return By</dt>
                   <dd className="text-white text-lg font-bold">
+                    {result.pass.scheduledReturn.toLocaleDateString("en-US", {
+                      month: "2-digit",
+                      day: "2-digit",
+                      year: "numeric",
+                    })}{" "}
                     {result.pass.scheduledReturn.toLocaleTimeString([], {
                       hour: "2-digit",
                       minute: "2-digit",
