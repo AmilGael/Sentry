@@ -38,26 +38,39 @@ export function OverdueStatCard({
   const [elapsed, setElapsed] = useState(() =>
     earliestOverdueSince ? Date.now() - new Date(earliestOverdueSince).getTime() : 0
   );
+  const [flashOn, setFlashOn] = useState(true);
 
   useEffect(() => {
     if (!earliestOverdueSince) return;
     const sinceMs = new Date(earliestOverdueSince).getTime();
     setElapsed(Date.now() - sinceMs);
-    const id = setInterval(() => setElapsed(Date.now() - sinceMs), 1000);
-    return () => clearInterval(id);
+    const timerId = setInterval(() => setElapsed(Date.now() - sinceMs), 1000);
+    return () => clearInterval(timerId);
   }, [earliestOverdueSince]);
+
+  useEffect(() => {
+    if (count === 0) return;
+    const id = setInterval(() => setFlashOn((prev) => !prev), 750);
+    return () => clearInterval(id);
+  }, [count]);
+
+  const isOverdue = count > 0;
 
   return (
     <div
-      className={`rounded-lg border p-4 ${
-        count > 0 ? "animate-overdue-flash border-red-700" : "border-gray-800 bg-gray-950"
+      className={`rounded-lg border p-4 transition-colors duration-300 ${
+        isOverdue
+          ? flashOn
+            ? "border-red-600 bg-red-900/60"
+            : "border-red-800 bg-red-950/30"
+          : "border-gray-800 bg-gray-950"
       }`}
     >
       <p className="text-xs text-gray-500 uppercase tracking-wider">Overdue</p>
-      <p className={`mt-1 text-3xl font-bold ${count > 0 ? "text-red-400" : "text-gray-500"}`}>
+      <p className={`mt-1 text-3xl font-bold ${isOverdue ? "text-red-400" : "text-gray-500"}`}>
         {count}
       </p>
-      {count > 0 && (
+      {isOverdue && (
         <p className="mt-1 font-mono tabular-nums text-sm text-red-300">
           {formatElapsed(elapsed)}
         </p>
