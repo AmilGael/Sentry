@@ -111,6 +111,7 @@ enum NotificationType {
   OVERDUE
   AWOL
   LATE_RETURN
+  INCIDENT
 }
 
 // ─────────────────────────────────────────────

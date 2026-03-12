@@ -80,8 +80,8 @@ npm run db:reset      # Reset DB and re-seed
 | 4     | Employment authorization workflow                        | ✅ Complete |
 | 5     | Movement pass generation, QR codes, HMAC signing         | ✅ Complete |
 | 6     | QR code generation and pass delivery                     | ✅ Complete |
-| 7     | Front Desk dashboard with real-time updates              | Pending     |
-| 8     | Incident reporting (automatic and manual)                | Pending     |
+| 7     | Front Desk dashboard with QR scanning & offline fallback | ✅ Complete |
+| 8     | Incident reporting (automatic and manual)                | ✅ Complete |
 | 9     | Reporting and analytics                                  | Pending     |
 | 10    | Admin configuration panel                                | Pending     |
 | 11    | Polish, accessibility audit, performance optimization    | Pending     |
