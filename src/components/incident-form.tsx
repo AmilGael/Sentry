@@ -45,7 +45,7 @@ export function IncidentForm({ residents }: { residents: Resident[] }) {
         <FormField
           label="Resident"
           name="residentId"
-          type="select"
+          as="select"
           required
           error={state.fieldErrors.residentId}
           options={residents.map((r) => ({
@@ -57,7 +57,7 @@ export function IncidentForm({ residents }: { residents: Resident[] }) {
         <FormField
           label="Incident Type"
           name="type"
-          type="select"
+          as="select"
           required
           error={state.fieldErrors.type}
           options={types}
@@ -66,7 +66,7 @@ export function IncidentForm({ residents }: { residents: Resident[] }) {
         <FormField
           label="Severity"
           name="severity"
-          type="select"
+          as="select"
           required
           error={state.fieldErrors.severity}
           options={severities}
@@ -82,7 +82,7 @@ export function IncidentForm({ residents }: { residents: Resident[] }) {
       <FormField
         label="Description"
         name="description"
-        type="textarea"
+        as="textarea"
         required
         error={state.fieldErrors.description}
         placeholder="Describe the incident in detail: what happened, when, where, and any relevant context..."

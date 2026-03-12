@@ -56,7 +56,7 @@ export function UserForm({ user }: { user?: UserData }) {
         <FormField
           label="Role"
           name="role"
-          type="select"
+          as="select"
           required
           defaultValue={user?.role}
           error={state.fieldErrors.role}

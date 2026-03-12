@@ -12,12 +12,17 @@ export function FrontDeskActions({
 }) {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
+  const [status, setStatus] = useState(passStatus);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   function handleCheckOut() {
     setError(null);
+    setSuccessMsg(null);
     startTransition(async () => {
       try {
         await checkOutResident(passId);
+        setStatus("USED");
+        setSuccessMsg("Checked out successfully");
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Check-out failed");
       }
@@ -26,9 +31,12 @@ export function FrontDeskActions({
 
   function handleCheckIn() {
     setError(null);
+    setSuccessMsg(null);
     startTransition(async () => {
       try {
         await checkInResident(passId);
+        setStatus("COMPLETED");
+        setSuccessMsg("Checked in successfully");
       } catch (e: unknown) {
         setError(e instanceof Error ? e.message : "Check-in failed");
       }
@@ -37,7 +45,7 @@ export function FrontDeskActions({
 
   return (
     <div className="flex items-center gap-2">
-      {passStatus === "ACTIVE" && (
+      {status === "ACTIVE" && (
         <button
           onClick={handleCheckOut}
           disabled={isPending}
@@ -46,7 +54,7 @@ export function FrontDeskActions({
           {isPending ? "…" : "Check Out"}
         </button>
       )}
-      {passStatus === "USED" && (
+      {status === "USED" && (
         <button
           onClick={handleCheckIn}
           disabled={isPending}
@@ -55,6 +63,10 @@ export function FrontDeskActions({
           {isPending ? "…" : "Check In"}
         </button>
       )}
+      {status === "COMPLETED" && (
+        <span className="text-xs font-medium text-green-400">Trip Complete</span>
+      )}
+      {successMsg && <span className="text-xs text-green-400">{successMsg}</span>}
       {error && <span className="text-xs text-red-400">{error}</span>}
     </div>
   );
