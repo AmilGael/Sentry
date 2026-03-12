@@ -1,0 +1,376 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// ─────────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────────
+
+enum UserRole {
+  ADMIN
+  CASE_MANAGER
+  EMPLOYMENT_SPECIALIST
+  FRONT_DESK
+}
+
+enum ResidentStatus {
+  INTAKE
+  IN_FACILITY
+  AUTHORIZED_OUT
+  OVERDUE
+  AWOL
+  RELEASED
+}
+
+enum AuthorizationStatus {
+  PENDING
+  UNDER_REVIEW
+  APPROVED
+  CM_SELF_APPROVED
+  ES_RATIFIED
+  ACTIVE
+  DENIED
+  REVOKED
+  EXPIRED
+}
+
+enum EmploymentType {
+  FULL_TIME
+  PART_TIME
+  TEMPORARY
+  DAY_LABOR
+}
+
+enum TransportationMethod {
+  PUBLIC_TRANSIT
+  PERSONAL_VEHICLE
+  EMPLOYER_TRANSPORT
+  WALKING
+  OTHER
+}
+
+enum ScheduleType {
+  RECURRING
+  ONE_TIME
+}
+
+enum PassType {
+  WORK
+  JOB_SEARCH
+  INTERVIEW
+}
+
+enum PassStatus {
+  ACTIVE
+  USED
+  COMPLETED
+  EXPIRED
+  CANCELLED
+}
+
+enum MovementDirection {
+  OUT
+  IN
+}
+
+enum IncidentType {
+  LATE_RETURN
+  OVERDUE
+  AWOL
+  PASS_TAMPERING
+  UNAUTHORIZED_ATTEMPT
+  OTHER
+}
+
+enum IncidentSeverity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+}
+
+enum IncidentStatus {
+  OPEN
+  UNDER_REVIEW
+  RESOLVED
+  CLOSED
+}
+
+enum NotificationType {
+  NEW_REQUEST
+  APPROVED
+  DENIED
+  REVOKED
+  EXPIRING
+  SELF_APPROVAL_ALERT
+  OVERDUE
+  AWOL
+  LATE_RETURN
+}
+
+// ─────────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────────
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  role      UserRole
+  password  String
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  assignedResidents          Resident[]              @relation("CaseManagerResidents")
+  requestedAuthorizations    EmploymentAuthorization[] @relation("RequestedBy")
+  reviewedAuthorizations     EmploymentAuthorization[] @relation("ReviewedBy")
+  ratifiedAuthorizations     EmploymentAuthorization[] @relation("RatifiedBy")
+  recordedMovementLogs       MovementLog[]
+  createdIncidents           IncidentReport[]         @relation("IncidentCreatedBy")
+  resolvedIncidents          IncidentReport[]         @relation("IncidentResolvedBy")
+  notifications              Notification[]
+
+  @@map("users")
+}
+
+// ─────────────────────────────────────────────
+// RESIDENT
+// ─────────────────────────────────────────────
+
+model Resident {
+  id                  String         @id @default(cuid())
+  inmateNumber        String         @unique
+  firstName           String
+  lastName            String
+  dateOfBirth         DateTime
+  intakeDate          DateTime
+  expectedReleaseDate DateTime
+  status              ResidentStatus @default(INTAKE)
+  roomAssignment      String?
+  emergencyContactName  String
+  emergencyContactPhone String
+  conditions          String?
+  notes               String?
+  isActive            Boolean        @default(true)
+  createdAt           DateTime       @default(now())
+  updatedAt           DateTime       @updatedAt
+
+  caseManagerId String
+  caseManager   User   @relation("CaseManagerResidents", fields: [caseManagerId], references: [id])
+
+  authorizations EmploymentAuthorization[]
+  passes         MovementPass[]
+  movementLogs   MovementLog[]
+  incidents      IncidentReport[]
+
+  @@map("residents")
+}
+
+// ─────────────────────────────────────────────
+// EMPLOYMENT AUTHORIZATION
+// ─────────────────────────────────────────────
+
+model EmploymentAuthorization {
+  id                String              @id @default(cuid())
+  status            AuthorizationStatus @default(PENDING)
+
+  // Employer details
+  employerName      String
+  employerAddress   String
+  employerPhone     String
+  employerContact   String
+  jobTitle          String
+  payRate           String?
+  employmentType    EmploymentType
+
+  // Schedule (stored as structured JSON)
+  scheduleType      ScheduleType
+  scheduleStartDate DateTime
+  scheduleEndDate   DateTime?
+  scheduleDays      String[]            // e.g. ["MONDAY","TUESDAY",...]
+  departureTime     String              // e.g. "06:30"
+  returnTime        String              // e.g. "17:30"
+  travelBufferMin   Int                 @default(30)
+
+  // Transportation
+  transportationMethod  TransportationMethod
+  transportationDetails String?
+
+  // Supporting info
+  supportingDocuments String?
+  caseManagerNotes    String?
+  denialReason        String?
+
+  // Self-approval fields (Section 4.1)
+  selfApprovedByCM          Boolean   @default(false)
+  selfApprovalJustification String?
+  selfApprovalTimestamp      DateTime?
+  esRatifiedAt               DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  residentId    String
+  resident      Resident @relation(fields: [residentId], references: [id])
+
+  requestedById String
+  requestedBy   User @relation("RequestedBy", fields: [requestedById], references: [id])
+
+  reviewedById  String?
+  reviewedBy    User? @relation("ReviewedBy", fields: [reviewedById], references: [id])
+
+  esRatifiedById String?
+  esRatifiedBy   User? @relation("RatifiedBy", fields: [esRatifiedById], references: [id])
+
+  passes MovementPass[]
+
+  @@map("employment_authorizations")
+}
+
+// ─────────────────────────────────────────────
+// MOVEMENT PASS
+// ─────────────────────────────────────────────
+
+model MovementPass {
+  id                  String     @id @default(cuid())
+  passDisplayId       String     @unique // e.g. MP-20260310-0042
+  residentFullName    String
+  residentInmateNumber String
+  employerName        String
+  employerAddress     String
+  passType            PassType
+  date                DateTime   @db.Date
+  scheduledDeparture  DateTime
+  scheduledReturn     DateTime
+  actualDeparture     DateTime?
+  actualReturn        DateTime?
+  status              PassStatus @default(ACTIVE)
+  hmacSignature       String
+  hmacKeyVersion      Int        @default(1)
+  qrCodeData          String
+  issuedAt            DateTime   @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  residentId      String
+  resident        Resident @relation(fields: [residentId], references: [id])
+
+  authorizationId String
+  authorization   EmploymentAuthorization @relation(fields: [authorizationId], references: [id])
+
+  movementLogs MovementLog[]
+  incidents    IncidentReport[]
+
+  @@index([date, status])
+  @@index([residentId, date])
+  @@map("movement_passes")
+}
+
+// ─────────────────────────────────────────────
+// MOVEMENT LOG (append-only audit trail)
+// ─────────────────────────────────────────────
+
+model MovementLog {
+  id        String            @id @default(cuid())
+  direction MovementDirection
+  timestamp DateTime          @default(now())
+
+  residentId   String
+  resident     Resident @relation(fields: [residentId], references: [id])
+
+  passId       String
+  pass         MovementPass @relation(fields: [passId], references: [id])
+
+  recordedById String
+  recordedBy   User @relation(fields: [recordedById], references: [id])
+
+  @@index([residentId, timestamp])
+  @@index([passId])
+  @@map("movement_logs")
+}
+
+// ─────────────────────────────────────────────
+// INCIDENT REPORT
+// ─────────────────────────────────────────────
+
+model IncidentReport {
+  id              String           @id @default(cuid())
+  incidentDisplayId String         @unique // e.g. INC-20260310-0003
+  type            IncidentType
+  severity        IncidentSeverity
+  description     String
+  status          IncidentStatus   @default(OPEN)
+  resolutionNotes String?
+  resolvedAt      DateTime?
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  residentId String
+  resident   Resident @relation(fields: [residentId], references: [id])
+
+  passId     String?
+  pass       MovementPass? @relation(fields: [passId], references: [id])
+
+  createdById  String
+  createdBy    User @relation("IncidentCreatedBy", fields: [createdById], references: [id])
+
+  resolvedById String?
+  resolvedBy   User? @relation("IncidentResolvedBy", fields: [resolvedById], references: [id])
+
+  @@index([residentId])
+  @@index([type, severity])
+  @@map("incident_reports")
+}
+
+// ─────────────────────────────────────────────
+// FACILITY CONFIGURATION (single row for v1)
+// ─────────────────────────────────────────────
+
+model FacilityConfiguration {
+  id                        String  @id @default(cuid())
+  facilityName              String  @default("Re-Entry Facility")
+  overdueThresholdMinutes   Int     @default(15)
+  awolThresholdMinutes      Int     @default(120)
+  passGenerationTime        String  @default("22:00")
+  maximumHoursOut           Int     @default(14)
+  earlyDepartureWindowMin   Int     @default(15)
+  qrCodeExpiryHours         Int     @default(24)
+  audioAlertsEnabled        Boolean @default(true)
+  selfApprovalEnabled       Boolean @default(true)
+  timezone                  String  @default("America/New_York")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("facility_configuration")
+}
+
+// ─────────────────────────────────────────────
+// NOTIFICATION (in-app only)
+// ─────────────────────────────────────────────
+
+model Notification {
+  id                String           @id @default(cuid())
+  type              NotificationType
+  title             String
+  body              String
+  relatedEntityType String?          // e.g. "Authorization", "Pass", "Resident", "Incident"
+  relatedEntityId   String?
+  isRead            Boolean          @default(false)
+  createdAt         DateTime         @default(now())
+
+  recipientId String
+  recipient   User @relation(fields: [recipientId], references: [id])
+
+  @@index([recipientId, isRead])
+  @@index([recipientId, createdAt])
+  @@map("notifications")
+}

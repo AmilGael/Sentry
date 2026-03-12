@@ -1,0 +1,18 @@
+export const APP_NAME = "Re-Entry Pass System";
+
+export const DEFAULTS = {
+  OVERDUE_THRESHOLD_MINUTES: 15,
+  AWOL_THRESHOLD_MINUTES: 120,
+  PASS_GENERATION_TIME: "22:00",
+  MAXIMUM_HOURS_OUT: 14,
+  EARLY_DEPARTURE_WINDOW_MIN: 15,
+  QR_CODE_EXPIRY_HOURS: 24,
+  TIMEZONE: "America/New_York",
+} as const;
+
+export const DISPLAY_ID_PREFIXES = {
+  RESIDENT: "R",
+  AUTHORIZATION: "EA",
+  PASS: "MP",
+  INCIDENT: "INC",
+} as const;
