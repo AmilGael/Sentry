@@ -5,29 +5,38 @@ import { generatePassForDate } from "@/lib/pass-engine";
 
 const VALID_STATUSES = ["APPROVED", "CM_SELF_APPROVED", "ES_RATIFIED", "ACTIVE"] as const;
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 /**
  * GET /api/demo/setup-front-desk
  * One-click demo: 1 overdue, 1 returning soon, 1 currently out, 2 scheduled, 3 returned.
+ * Always runs (no cache) and clears today's passes before creating fresh demo state.
  */
 export async function GET() {
   try {
     const now = new Date();
-    // Use same date range as getTodaysPasses so we clear exactly what the dashboard shows
-    const today = new Date(now);
-    today.setHours(0, 0, 0, 0);
-    const tomorrow = new Date(today);
-    tomorrow.setDate(tomorrow.getDate() + 1);
+    // Calendar date (local) so clear and create always match getTodaysPasses
+    const y = now.getFullYear();
+    const m = String(now.getMonth() + 1).padStart(2, "0");
+    const d = String(now.getDate()).padStart(2, "0");
+    const todayStr = `${y}-${m}-${d}`;
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const tomorrowStr = `${tomorrow.getFullYear()}-${String(tomorrow.getMonth() + 1).padStart(2, "0")}-${String(tomorrow.getDate()).padStart(2, "0")}`;
 
-    // Clear today's passes and their movement logs
-    const existingPasses = await prisma.movementPass.findMany({
-      where: { date: { gte: today, lt: tomorrow } },
-      select: { id: true },
-    });
-    const passIds = existingPasses.map((p) => p.id);
-    if (passIds.length > 0) {
-      await prisma.movementLog.deleteMany({ where: { passId: { in: passIds } } });
-      await prisma.movementPass.deleteMany({ where: { id: { in: passIds } } });
-    }
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+
+    // Clear ALL passes for today by calendar date (logs first, then passes)
+    await prisma.$executeRawUnsafe(
+      'DELETE FROM movement_logs WHERE "passId" IN (SELECT id FROM movement_passes WHERE date >= $1::date AND date < $2::date)',
+      todayStr,
+      tomorrowStr
+    );
+    await prisma.$executeRawUnsafe(
+      "DELETE FROM movement_passes WHERE date >= $1::date AND date < $2::date",
+      todayStr,
+      tomorrowStr
+    );
 
     // Need at least 8 approved authorizations
     const authorizations = await prisma.employmentAuthorization.findMany({
@@ -187,7 +196,10 @@ export async function GET() {
 
     revalidatePath("/dashboard/front-desk");
     const baseUrl = process.env.AUTH_URL ?? "http://localhost:3000";
-    return NextResponse.redirect(`${baseUrl}/dashboard/front-desk`);
+    const redirectUrl = `${baseUrl}/dashboard/front-desk?_=${Date.now()}`;
+    const res = NextResponse.redirect(redirectUrl);
+    res.headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    return res;
   } catch (e) {
     const message = e instanceof Error ? e.message : "Failed to setup demo";
     return NextResponse.json({ error: message }, { status: 400 });

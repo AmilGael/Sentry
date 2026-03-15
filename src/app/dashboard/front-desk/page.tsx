@@ -4,6 +4,9 @@ import { requireRole } from "@/lib/auth-utils";
 import { StatusBadge } from "@/components/ui/status-badge";
 import { OfflineCacheManager } from "@/components/offline-cache-manager";
 import { OverdueStatCard, OverdueTimer } from "@/components/overdue-timer";
+import { DemoQRPassButton } from "@/components/demo-qr-pass-button";
+
+export const dynamic = "force-dynamic";
 
 export default async function FrontDeskPage() {
   await requireRole("ADMIN", "FRONT_DESK");
@@ -42,14 +45,10 @@ export default async function FrontDeskPage() {
           >
             Demo: Start Front Desk
           </Link>
-          <Link
-            href="/api/demo/create-pass"
-            target="_blank"
-            rel="noopener noreferrer"
+          <DemoQRPassButton
+            refreshDashboard
             className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-950 hover:bg-amber-400 transition-colors"
-          >
-            Demo: QR Pass
-          </Link>
+          />
           <Link
             href="/dashboard/front-desk/scan"
             className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-gray-200 transition-colors"

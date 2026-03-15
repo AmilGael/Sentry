@@ -6,28 +6,47 @@ const VALID_STATUSES = ["APPROVED", "CM_SELF_APPROVED", "ES_RATIFIED", "ACTIVE"]
 
 /**
  * GET /api/demo/create-pass
- * Creates a new ACTIVE pass for today with a randomly chosen resident (from approved
- * authorizations) so each click can show a different name.
+ * Creates a new ACTIVE pass for today with a randomly chosen resident who does NOT
+ * already have a pass for today (not in any Front Desk category).
  */
 export async function GET() {
   try {
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+
+    const todaysPasses = await prisma.movementPass.findMany({
+      where: { date: { gte: today, lt: tomorrow } },
+      select: { residentId: true },
+    });
+    const residentIdsWithPassToday = [...new Set(todaysPasses.map((p) => p.residentId))];
+
     const authorizations = await prisma.employmentAuthorization.findMany({
-      where: { status: { in: [...VALID_STATUSES] } },
+      where: {
+        status: { in: [...VALID_STATUSES] },
+        resident:
+          residentIdsWithPassToday.length > 0
+            ? { id: { notIn: residentIdsWithPassToday } }
+            : undefined,
+      },
       select: { id: true },
     });
 
     if (authorizations.length === 0) {
       return NextResponse.json(
-        { error: "No approved authorizations found. Create and approve one first." },
+        {
+          error:
+            residentIdsWithPassToday.length > 0
+              ? "No residents without a pass for today. Use the red demo to reset the board, then try again."
+              : "No approved authorizations found. Run seed or create more.",
+        },
         { status: 400 }
       );
     }
 
     const randomIndex = Math.floor(Math.random() * authorizations.length);
     const authId = authorizations[randomIndex].id;
-
-    const now = new Date();
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
     const pass = await generatePassForDate(authId, today, "WORK");
 

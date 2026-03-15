@@ -31,11 +31,22 @@ export async function getPasses(params: {
 }) {
   await getSession();
 
+  const todayStart = new Date();
+  todayStart.setHours(0, 0, 0, 0);
+
   const where: Record<string, unknown> = {};
   if (params.view === "scheduled") {
     where.status = { in: ["ACTIVE", "USED"] };
+    // Scheduled = only today and future; don’t show past-date passes here
+    if (!params.date) {
+      where.date = { gte: todayStart };
+    }
   } else if (params.view === "expired") {
-    where.status = { in: ["EXPIRED", "CANCELLED", "COMPLETED"] };
+    // Expired / past = past date OR completed/expired/cancelled status
+    where.OR = [
+      { date: { lt: todayStart } },
+      { status: { in: ["EXPIRED", "CANCELLED", "COMPLETED"] } },
+    ];
   } else if (params.status) {
     where.status = params.status;
   }

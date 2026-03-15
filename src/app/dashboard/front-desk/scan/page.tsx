@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { QRScanner } from "@/components/qr-scanner";
 import { FrontDeskActions } from "@/components/front-desk-actions";
+import { DemoQRPassButton } from "@/components/demo-qr-pass-button";
 import { verifyQRCode, lookupPass, type VerifyResult } from "@/lib/actions/front-desk";
 
 export default function ScanPage() {
@@ -44,14 +45,10 @@ export default function ScanPage() {
           </Link>
           <h1 className="mt-2 text-2xl font-bold text-white">Scan / Verify Pass</h1>
         </div>
-        <Link
-          href="/api/demo/create-pass"
-          target="_blank"
-          rel="noopener noreferrer"
+        <DemoQRPassButton
+          refreshDashboard
           className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-950 hover:bg-amber-400 transition-colors whitespace-nowrap"
-        >
-          Demo: QR Pass
-        </Link>
+        />
       </div>
 
       {!result ? (
@@ -59,7 +56,7 @@ export default function ScanPage() {
           {/* QR Scanner */}
           <section className="rounded-lg border border-gray-800 bg-gray-950 p-6 space-y-4">
             <h2 className="text-lg font-semibold text-white text-center">Scan QR Code</h2>
-            <QRScanner onScan={handleScan} />
+            <QRScanner onScan={handleScan} autoStart />
             {isPending && (
               <p className="text-sm text-gray-400 text-center">Verifying…</p>
             )}

@@ -104,11 +104,11 @@ async function main() {
     `  ✓ Users: ${[admin, cm1, cm2, es1, fd1, fd2].map((u) => u.name).join(", ")}`
   );
 
-  // ─── Residents ───
+  // ─── Residents (male names only, pool of 20 for demo QR pass) ───
   const residents = await Promise.all([
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-44821" },
-      update: {},
+      update: { firstName: "James", lastName: "Mitchell" },
       create: {
         inmateNumber: "DOC-2024-44821",
         firstName: "James",
@@ -126,7 +126,7 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-51093" },
-      update: {},
+      update: { firstName: "Anthony", lastName: "Davis" },
       create: {
         inmateNumber: "DOC-2024-51093",
         firstName: "Anthony",
@@ -143,7 +143,7 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2025-60284" },
-      update: {},
+      update: { firstName: "Kevin", lastName: "Thompson" },
       create: {
         inmateNumber: "DOC-2025-60284",
         firstName: "Kevin",
@@ -161,7 +161,7 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2025-62117" },
-      update: {},
+      update: { firstName: "Derek", lastName: "Robinson" },
       create: {
         inmateNumber: "DOC-2025-62117",
         firstName: "Derek",
@@ -178,7 +178,7 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-39855" },
-      update: {},
+      update: { firstName: "Michael", lastName: "Harris" },
       create: {
         inmateNumber: "DOC-2024-39855",
         firstName: "Michael",
@@ -193,10 +193,10 @@ async function main() {
         caseManagerId: cm1.id,
       },
     }),
-    // Extra residents for demo pass variety (10 names total with approved auths)
+    // Extra residents for demo pass variety (20 male names total with approved auths)
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-41200" },
-      update: {},
+      update: { firstName: "Carlos", lastName: "Martinez" },
       create: {
         inmateNumber: "DOC-2024-41200",
         firstName: "Carlos",
@@ -213,10 +213,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2025-50111" },
-      update: {},
+      update: { firstName: "Jason", lastName: "Williams" },
       create: {
         inmateNumber: "DOC-2025-50111",
-        firstName: "Jennifer",
+        firstName: "Jason",
         lastName: "Williams",
         dateOfBirth: new Date("1988-12-08"),
         intakeDate: new Date("2026-02-05"),
@@ -230,10 +230,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-52333" },
-      update: {},
+      update: { firstName: "Robert", lastName: "Johnson" },
       create: {
         inmateNumber: "DOC-2024-52333",
-        firstName: "Marcus",
+        firstName: "Robert",
         lastName: "Johnson",
         dateOfBirth: new Date("1992-03-17"),
         intakeDate: new Date("2025-12-01"),
@@ -247,10 +247,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2025-61444" },
-      update: {},
+      update: { firstName: "Daniel", lastName: "Garcia" },
       create: {
         inmateNumber: "DOC-2025-61444",
-        firstName: "Sandra",
+        firstName: "Daniel",
         lastName: "Garcia",
         dateOfBirth: new Date("1985-08-30"),
         intakeDate: new Date("2026-03-01"),
@@ -264,10 +264,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-44555" },
-      update: {},
+      update: { firstName: "David", lastName: "Brown" },
       create: {
         inmateNumber: "DOC-2024-44555",
-        firstName: "Robert",
+        firstName: "David",
         lastName: "Brown",
         dateOfBirth: new Date("1994-01-11"),
         intakeDate: new Date("2026-01-10"),
@@ -281,10 +281,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2025-62666" },
-      update: {},
+      update: { firstName: "Christopher", lastName: "Taylor" },
       create: {
         inmateNumber: "DOC-2025-62666",
-        firstName: "Amanda",
+        firstName: "Christopher",
         lastName: "Taylor",
         dateOfBirth: new Date("1991-06-25"),
         intakeDate: new Date("2026-02-15"),
@@ -298,10 +298,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2024-47777" },
-      update: {},
+      update: { firstName: "Joseph", lastName: "Wilson" },
       create: {
         inmateNumber: "DOC-2024-47777",
-        firstName: "Daniel",
+        firstName: "Joseph",
         lastName: "Wilson",
         dateOfBirth: new Date("1989-10-03"),
         intakeDate: new Date("2025-11-25"),
@@ -315,10 +315,10 @@ async function main() {
     }),
     prisma.resident.upsert({
       where: { inmateNumber: "DOC-2025-63888" },
-      update: {},
+      update: { firstName: "Matthew", lastName: "Anderson" },
       create: {
         inmateNumber: "DOC-2025-63888",
-        firstName: "Nicole",
+        firstName: "Matthew",
         lastName: "Anderson",
         dateOfBirth: new Date("1993-04-19"),
         intakeDate: new Date("2026-03-05"),
@@ -330,13 +330,133 @@ async function main() {
         caseManagerId: cm2.id,
       },
     }),
+    // Residents 14–20 (male names, for 20-name demo pool)
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2025-64001" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2025-64001",
+        firstName: "Andrew",
+        lastName: "Clark",
+        dateOfBirth: new Date("1990-02-14"),
+        intakeDate: new Date("2026-02-10"),
+        expectedReleaseDate: new Date("2026-10-01"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-101",
+        emergencyContactName: "Mary Clark",
+        emergencyContactPhone: "(555) 567-8901",
+        caseManagerId: cm1.id,
+      },
+    }),
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2024-64002" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2024-64002",
+        firstName: "Joshua",
+        lastName: "Lewis",
+        dateOfBirth: new Date("1988-06-22"),
+        intakeDate: new Date("2025-12-15"),
+        expectedReleaseDate: new Date("2026-07-01"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-102",
+        emergencyContactName: "Tom Lewis",
+        emergencyContactPhone: "(555) 678-9012",
+        caseManagerId: cm2.id,
+      },
+    }),
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2025-64003" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2025-64003",
+        firstName: "Brandon",
+        lastName: "Lee",
+        dateOfBirth: new Date("1992-11-08"),
+        intakeDate: new Date("2026-03-01"),
+        expectedReleaseDate: new Date("2026-11-15"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-103",
+        emergencyContactName: "Susan Lee",
+        emergencyContactPhone: "(555) 789-0123",
+        caseManagerId: cm1.id,
+      },
+    }),
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2024-64004" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2024-64004",
+        firstName: "Tyler",
+        lastName: "Walker",
+        dateOfBirth: new Date("1991-04-30"),
+        intakeDate: new Date("2026-01-05"),
+        expectedReleaseDate: new Date("2026-08-20"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-104",
+        emergencyContactName: "Jane Walker",
+        emergencyContactPhone: "(555) 890-1234",
+        caseManagerId: cm2.id,
+      },
+    }),
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2025-64005" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2025-64005",
+        firstName: "Ryan",
+        lastName: "Hall",
+        dateOfBirth: new Date("1989-08-17"),
+        intakeDate: new Date("2026-02-20"),
+        expectedReleaseDate: new Date("2026-12-01"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-105",
+        emergencyContactName: "Patricia Hall",
+        emergencyContactPhone: "(555) 901-2345",
+        caseManagerId: cm1.id,
+      },
+    }),
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2024-64006" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2024-64006",
+        firstName: "Justin",
+        lastName: "Young",
+        dateOfBirth: new Date("1994-01-25"),
+        intakeDate: new Date("2025-11-20"),
+        expectedReleaseDate: new Date("2026-06-15"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-106",
+        emergencyContactName: "Linda Young",
+        emergencyContactPhone: "(555) 012-3456",
+        caseManagerId: cm2.id,
+      },
+    }),
+    prisma.resident.upsert({
+      where: { inmateNumber: "DOC-2025-64007" },
+      update: {},
+      create: {
+        inmateNumber: "DOC-2025-64007",
+        firstName: "Nicholas",
+        lastName: "King",
+        dateOfBirth: new Date("1990-09-11"),
+        intakeDate: new Date("2026-03-10"),
+        expectedReleaseDate: new Date("2026-10-30"),
+        status: "IN_FACILITY",
+        roomAssignment: "D-107",
+        emergencyContactName: "Barbara King",
+        emergencyContactPhone: "(555) 111-2222",
+        caseManagerId: cm1.id,
+      },
+    }),
   ]);
 
   console.log(
     `  ✓ Residents: ${residents.map((r) => `${r.firstName} ${r.lastName} (${r.inmateNumber})`).join(", ")}`
   );
 
-  // ─── Employment Authorization (approved, for James Mitchell) ───
+  // ─── Employment Authorization (approved, for Jessica Mitchell) ───
   const auth1 = await prisma.employmentAuthorization.upsert({
     where: { id: "auth-seed-001" },
     update: {},
@@ -365,7 +485,7 @@ async function main() {
     },
   });
 
-  // ─── Employment Authorization (pending, for Kevin Thompson) ───
+  // ─── Employment Authorization (pending, for Kimberly Thompson) ───
   const auth2 = await prisma.employmentAuthorization.upsert({
     where: { id: "auth-seed-002" },
     update: {},
@@ -395,7 +515,7 @@ async function main() {
     },
   });
 
-  // ─── Employment Authorization (self-approved, for Anthony Davis) ───
+  // ─── Employment Authorization (self-approved, for Ashley Davis) ───
   const auth3 = await prisma.employmentAuthorization.upsert({
     where: { id: "auth-seed-003" },
     update: {},
@@ -644,9 +764,198 @@ async function main() {
       reviewedById: es1.id,
     },
   });
+  const auth12 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-012" },
+    update: {},
+    create: {
+      id: "auth-seed-012",
+      status: "APPROVED",
+      employerName: "Metro Logistics",
+      employerAddress: "5600 Distribution Way",
+      employerPhone: "(555) 999-1111",
+      employerContact: "Bill Foster",
+      jobTitle: "Forklift Operator",
+      payRate: "$17.50/hr",
+      employmentType: "FULL_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-01"),
+      scheduleEndDate: null,
+      scheduleDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+      departureTime: "06:00",
+      returnTime: "14:30",
+      travelBufferMin: 40,
+      transportationMethod: "PUBLIC_TRANSIT",
+      transportationDetails: "Bus 22 to Distribution Way.",
+      residentId: residents[13].id,
+      requestedById: cm1.id,
+      reviewedById: es1.id,
+    },
+  });
+  const auth13 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-013" },
+    update: {},
+    create: {
+      id: "auth-seed-013",
+      status: "ES_RATIFIED",
+      employerName: "Summit Printing",
+      employerAddress: "3200 Paper Mill Rd",
+      employerPhone: "(555) 000-2222",
+      employerContact: "Greg Moore",
+      jobTitle: "Press Operator",
+      payRate: "$16.00/hr",
+      employmentType: "FULL_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-05"),
+      scheduleEndDate: null,
+      scheduleDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+      departureTime: "07:30",
+      returnTime: "16:00",
+      travelBufferMin: 30,
+      transportationMethod: "PUBLIC_TRANSIT",
+      transportationDetails: "Bus 9.",
+      residentId: residents[14].id,
+      requestedById: cm2.id,
+      reviewedById: es1.id,
+    },
+  });
+  const auth14 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-014" },
+    update: {},
+    create: {
+      id: "auth-seed-014",
+      status: "APPROVED",
+      employerName: "Pine Tree Landscaping",
+      employerAddress: "890 Green Valley Rd",
+      employerPhone: "(555) 111-3333",
+      employerContact: "Dave Hill",
+      jobTitle: "Groundskeeper",
+      payRate: "$15.50/hr",
+      employmentType: "FULL_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-08"),
+      scheduleEndDate: null,
+      scheduleDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+      departureTime: "06:30",
+      returnTime: "15:00",
+      travelBufferMin: 35,
+      transportationMethod: "EMPLOYER_TRANSPORT",
+      transportationDetails: "Crew van pickup.",
+      residentId: residents[15].id,
+      requestedById: cm1.id,
+      reviewedById: es1.id,
+    },
+  });
+  const auth15 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-015" },
+    update: {},
+    create: {
+      id: "auth-seed-015",
+      status: "APPROVED",
+      employerName: "Riverside Storage",
+      employerAddress: "2100 River Rd",
+      employerPhone: "(555) 222-4444",
+      employerContact: "Ken Scott",
+      jobTitle: "Warehouse Associate",
+      payRate: "$16.25/hr",
+      employmentType: "FULL_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-02"),
+      scheduleEndDate: null,
+      scheduleDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"],
+      departureTime: "08:00",
+      returnTime: "16:00",
+      travelBufferMin: 25,
+      transportationMethod: "PUBLIC_TRANSIT",
+      transportationDetails: "Bus 14.",
+      residentId: residents[16].id,
+      requestedById: cm2.id,
+      reviewedById: es1.id,
+    },
+  });
+  const auth16 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-016" },
+    update: {},
+    create: {
+      id: "auth-seed-016",
+      status: "ES_RATIFIED",
+      employerName: "Central Kitchen Supply",
+      employerAddress: "4500 Chef Way",
+      employerPhone: "(555) 333-5555",
+      employerContact: "Ray Green",
+      jobTitle: "Prep Cook",
+      payRate: "$15.00/hr",
+      employmentType: "FULL_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-10"),
+      scheduleEndDate: null,
+      scheduleDays: ["TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"],
+      departureTime: "09:00",
+      returnTime: "17:00",
+      travelBufferMin: 30,
+      transportationMethod: "WALKING",
+      transportationDetails: "0.6 mi from facility.",
+      residentId: residents[17].id,
+      requestedById: cm1.id,
+      reviewedById: es1.id,
+    },
+  });
+  const auth17 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-017" },
+    update: {},
+    create: {
+      id: "auth-seed-017",
+      status: "APPROVED",
+      employerName: "Valley Hardware",
+      employerAddress: "1200 Tool Lane",
+      employerPhone: "(555) 444-6666",
+      employerContact: "Ed Adams",
+      jobTitle: "Sales Associate",
+      payRate: "$14.50/hr",
+      employmentType: "PART_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-06"),
+      scheduleEndDate: null,
+      scheduleDays: ["WEDNESDAY", "THURSDAY", "FRIDAY", "SATURDAY"],
+      departureTime: "10:00",
+      returnTime: "18:00",
+      travelBufferMin: 20,
+      transportationMethod: "PUBLIC_TRANSIT",
+      transportationDetails: "Bus 8.",
+      residentId: residents[18].id,
+      requestedById: cm2.id,
+      reviewedById: es1.id,
+    },
+  });
+  const auth18 = await prisma.employmentAuthorization.upsert({
+    where: { id: "auth-seed-018" },
+    update: {},
+    create: {
+      id: "auth-seed-018",
+      status: "APPROVED",
+      employerName: "First Security Services",
+      employerAddress: "900 Guard Post Dr",
+      employerPhone: "(555) 555-7777",
+      employerContact: "Frank Bell",
+      jobTitle: "Security Monitor",
+      payRate: "$18.00/hr",
+      employmentType: "FULL_TIME",
+      scheduleType: "RECURRING",
+      scheduleStartDate: new Date("2026-03-12"),
+      scheduleEndDate: null,
+      scheduleDays: ["MONDAY", "TUESDAY", "WEDNESDAY", "THURSDAY", "FRIDAY"],
+      departureTime: "14:00",
+      returnTime: "22:00",
+      travelBufferMin: 30,
+      transportationMethod: "PUBLIC_TRANSIT",
+      transportationDetails: "Bus 6 evening route.",
+      residentId: residents[19].id,
+      requestedById: cm1.id,
+      reviewedById: es1.id,
+    },
+  });
 
   console.log(
-    `  ✓ Authorizations: ${[auth1, auth2, auth3, auth4, auth5, auth6, auth7, auth8, auth9, auth10, auth11].map((a) => `${a.employerName} (${a.status})`).join(", ")}`
+    `  ✓ Authorizations: ${[auth1, auth2, auth3, auth4, auth5, auth6, auth7, auth8, auth9, auth10, auth11, auth12, auth13, auth14, auth15, auth16, auth17, auth18].map((a) => `${a.employerName} (${a.status})`).join(", ")}`
   );
 
   // ─── Notifications (sample) ───
