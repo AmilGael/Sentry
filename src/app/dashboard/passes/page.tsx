@@ -5,7 +5,7 @@ import { StatusBadge } from "@/components/ui/status-badge";
 import type { PassStatus } from "@/generated/prisma/client";
 
 export default async function PassesPage(props: {
-  searchParams: Promise<{ status?: PassStatus; date?: string }>;
+  searchParams: Promise<{ status?: PassStatus; view?: "scheduled" | "expired"; date?: string }>;
 }) {
   await getSession();
   const searchParams = await props.searchParams;
@@ -14,6 +14,7 @@ export default async function PassesPage(props: {
 
   const passes = await getPasses({
     status: searchParams.status,
+    view: searchParams.view,
     date: searchParams.date,
   });
 
@@ -29,18 +30,35 @@ export default async function PassesPage(props: {
       </div>
 
       <form className="flex flex-wrap gap-3">
-        <input
-          name="date"
-          type="date"
-          defaultValue={searchParams.date ?? today}
-          className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
-        />
+        <div>
+          <label htmlFor="view" className="sr-only">View</label>
+          <select
+            id="view"
+            name="view"
+            defaultValue={searchParams.view ?? ""}
+            className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
+          >
+            <option value="">All passes</option>
+            <option value="scheduled">Scheduled passes</option>
+            <option value="expired">Expired / past</option>
+          </select>
+        </div>
+        <div>
+          <label htmlFor="date" className="sr-only">Date</label>
+          <input
+            id="date"
+            name="date"
+            type="date"
+            defaultValue={searchParams.date ?? today}
+            className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
+          />
+        </div>
         <select
           name="status"
           defaultValue={searchParams.status}
           className="rounded-lg border border-gray-700 bg-gray-900 px-4 py-2 text-sm text-white focus:border-white focus:outline-none focus:ring-1 focus:ring-white"
         >
-          <option value="">All Statuses</option>
+          <option value="">All statuses</option>
           {statuses.map((s) => (
             <option key={s} value={s}>{s}</option>
           ))}

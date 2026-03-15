@@ -24,7 +24,9 @@ export function OverdueTimer({ since }: { since: string }) {
   }, [sinceMs]);
 
   return (
-    <span className="font-mono tabular-nums text-red-300">{formatElapsed(elapsed)}</span>
+    <span className="font-mono tabular-nums text-red-300" suppressHydrationWarning>
+      {formatElapsed(elapsed)}
+    </span>
   );
 }
 
@@ -71,7 +73,7 @@ export function OverdueStatCard({
         {count}
       </p>
       {isOverdue && (
-        <p className="mt-1 font-mono tabular-nums text-sm text-red-300">
+        <p className="mt-1 font-mono tabular-nums text-sm text-red-300" suppressHydrationWarning>
           {formatElapsed(elapsed)}
         </p>
       )}

@@ -34,14 +34,24 @@ export default function ScanPage() {
 
   return (
     <div className="space-y-6">
-      <div>
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <div>
+          <Link
+            href="/dashboard/front-desk"
+            className="text-sm text-gray-400 hover:text-white transition-colors"
+          >
+            ← Back to Front Desk
+          </Link>
+          <h1 className="mt-2 text-2xl font-bold text-white">Scan / Verify Pass</h1>
+        </div>
         <Link
-          href="/dashboard/front-desk"
-          className="text-sm text-gray-400 hover:text-white transition-colors"
+          href="/api/demo/create-pass"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-950 hover:bg-amber-400 transition-colors whitespace-nowrap"
         >
-          ← Back to Front Desk
+          Demo: QR Pass
         </Link>
-        <h1 className="mt-2 text-2xl font-bold text-white">Scan / Verify Pass</h1>
       </div>
 
       {!result ? (

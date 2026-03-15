@@ -2,7 +2,6 @@ import Link from "next/link";
 import { getTodaysPasses } from "@/lib/actions/front-desk";
 import { requireRole } from "@/lib/auth-utils";
 import { StatusBadge } from "@/components/ui/status-badge";
-import { FrontDeskActions } from "@/components/front-desk-actions";
 import { OfflineCacheManager } from "@/components/offline-cache-manager";
 import { OverdueStatCard, OverdueTimer } from "@/components/overdue-timer";
 
@@ -35,8 +34,22 @@ export default async function FrontDeskPage() {
             })}
           </p>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <OfflineCacheManager />
+          <Link
+            href="/api/demo/setup-front-desk"
+            className="rounded-lg bg-red-600 px-4 py-2 text-sm font-semibold text-white hover:bg-red-500 transition-colors"
+          >
+            Demo: Start Front Desk
+          </Link>
+          <Link
+            href="/api/demo/create-pass"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-gray-950 hover:bg-amber-400 transition-colors"
+          >
+            Demo: QR Pass
+          </Link>
           <Link
             href="/dashboard/front-desk/scan"
             className="rounded-lg bg-white px-5 py-2.5 text-sm font-semibold text-black hover:bg-gray-200 transition-colors"
@@ -92,7 +105,12 @@ export default async function FrontDeskPage() {
                     · Overdue by <OverdueTimer since={p.scheduledReturn.toISOString()} />
                   </p>
                 </div>
-                <FrontDeskActions passId={p.id} passStatus={p.status} />
+                <Link
+                  href="/dashboard/front-desk/scan"
+                  className="text-xs text-blue-400 hover:text-blue-300"
+                >
+                  Scan QR to check in →
+                </Link>
               </div>
           ))}
         </div>
@@ -142,10 +160,10 @@ export default async function FrontDeskPage() {
         </section>
       )}
 
-      {/* Completed */}
+      {/* Returned / Completed */}
       {completed.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-semibold text-white">Completed ({completed.length})</h2>
+          <h2 className="text-lg font-semibold text-white">Returned / Completed ({completed.length})</h2>
           <div className="space-y-2">
             {completed.map((p) => (
               <PassRow key={p.id} pass={p} />
@@ -256,7 +274,12 @@ function PassRow({
           </p>
         )}
       </div>
-      <FrontDeskActions passId={pass.id} passStatus={pass.status} />
+      <Link
+        href="/dashboard/front-desk/scan"
+        className="text-xs font-medium text-blue-400 hover:text-blue-300 whitespace-nowrap"
+      >
+        Scan QR to check out/in →
+      </Link>
     </div>
   );
 }

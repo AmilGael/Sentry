@@ -49,6 +49,7 @@ const STATUS_LABELS: Record<string, string> = {
   LATE_RETURN: "Late Return",
   PASS_TAMPERING: "Pass Tampering",
   UNAUTHORIZED_ATTEMPT: "Unauthorized Attempt",
+  COMPLETED: "Returned",
 };
 
 function formatStatus(status: string): string {

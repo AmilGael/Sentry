@@ -25,13 +25,20 @@ export async function generatePassAction(authorizationId: string, dateStr: strin
 
 export async function getPasses(params: {
   status?: PassStatus;
+  view?: "scheduled" | "expired";
   residentId?: string;
   date?: string;
 }) {
   await getSession();
 
   const where: Record<string, unknown> = {};
-  if (params.status) where.status = params.status;
+  if (params.view === "scheduled") {
+    where.status = { in: ["ACTIVE", "USED"] };
+  } else if (params.view === "expired") {
+    where.status = { in: ["EXPIRED", "CANCELLED", "COMPLETED"] };
+  } else if (params.status) {
+    where.status = params.status;
+  }
   if (params.residentId) where.residentId = params.residentId;
   if (params.date) {
     const [y, m, dy] = params.date.split("-").map(Number);
