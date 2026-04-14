@@ -1,87 +1,80 @@
-# Re-Entry — Resident Management & Employment Pass System
+# Sentry — Re-Entry Resident Management & Employment Pass System
 
-A web-based case management system for residential re-entry facilities. Digitizes employment authorization workflows, generates cryptographically signed movement passes, and provides real-time Front Desk monitoring.
+A web-based case management system for residential re-entry facilities. Digitizes employment authorization workflows, generates cryptographically signed movement passes, and provides real-time Front Desk monitoring — replacing paper work passes with a QR-verified system that makes unauthorized leave impossible to hide.
 
-See **Re-Entry_PRD.md** for the full product requirements document.
+See `Re-Entry_PRD.md` for the full product requirements document.
 
 ## Tech Stack
-
 - **Framework:** Next.js 16 (App Router, TypeScript)
 - **Styling:** Tailwind CSS 4
 - **Database:** PostgreSQL 15+
 - **ORM:** Prisma 7
-- **Auth:** NextAuth.js (Auth.js v5)
-- **Real-Time:** WebSocket (planned — Phase 7)
-- **Crypto:** Node.js `crypto` module (HMAC-SHA256)
+- **Auth:** NextAuth.js (Auth.js v5) — role-based access
+- **Real-Time:** WebSocket
+- **Crypto:** Node.js `crypto` module (HMAC-SHA256) for signed passes
 
-## Getting Started
+## What I Built
+- Designed the **Prisma schema** for residents, employment authorizations, movement passes, and incidents
+- Built **resident management** (CRUD, status tracking) and the **employment authorization workflow**
+- Implemented **HMAC-SHA256 movement pass generation** with QR code delivery
+- Built the **Front Desk dashboard** — QR scanning, verification, and offline fallback
+- Added **incident reporting** (automatic on pass violation + manual entry)
+- Implemented **role-based auth** (Admin, Case Manager, Employment Specialist, Front Desk)
 
-### Prerequisites
+## Key Features
+- Cryptographically signed, QR-verified movement passes
+- Real-time Front Desk dashboard
+- Role-based access control with four distinct user roles
+- Automatic incident generation on unauthorized movement
+- Reporting and analytics module
 
-- Node.js 20+
-- PostgreSQL 15+ (local or hosted)
-
-### Setup
+## How to Run
+**Prerequisites:** Node.js 20+, PostgreSQL 15+
 
 ```bash
 # Install dependencies
 npm install
 
-# Copy environment variables and configure
+# Configure environment
 cp .env.example .env
 # Edit .env with your database URL and secrets
 
-# Generate Prisma client
+# Generate Prisma client and run migrations
 npm run db:generate
-
-# Run database migrations
 npm run db:migrate
-
-# Seed the database with sample data
 npm run db:seed
 
 # Start the dev server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open http://localhost:3000.
 
-### Seed Data Credentials
+### Seed Credentials
+All seed users share password: `Password123!`
 
-All seed users share the same password: `Password123!`
-
-| Role                  | Email                        | Name             |
-|-----------------------|------------------------------|------------------|
-| Admin                 | admin@reentry.local          | Diana Torres     |
-| Case Manager          | cm.williams@reentry.local    | Marcus Williams  |
-| Case Manager          | cm.chen@reentry.local        | Lisa Chen        |
-| Employment Specialist | es.grant@reentry.local       | Robert Grant     |
-| Front Desk            | fd.jackson@reentry.local     | Angela Jackson   |
-| Front Desk            | fd.martinez@reentry.local    | Carlos Martinez  |
+| Role | Email |
+|------|-------|
+| Admin | admin@reentry.local |
+| Case Manager | cm.williams@reentry.local |
+| Employment Specialist | es.grant@reentry.local |
+| Front Desk | fd.jackson@reentry.local |
 
 ### Database Commands
-
 ```bash
-npm run db:generate   # Regenerate Prisma client after schema changes
-npm run db:migrate    # Create and apply a new migration
-npm run db:push       # Push schema to DB without migration (dev only)
-npm run db:seed       # Run seed script
-npm run db:studio     # Open Prisma Studio (visual DB browser)
-npm run db:reset      # Reset DB and re-seed
+npm run db:generate  # Regenerate Prisma client
+npm run db:migrate   # Create and apply a new migration
+npm run db:push      # Push schema without migration (dev only)
+npm run db:seed      # Run seed script
+npm run db:studio    # Open Prisma Studio
+npm run db:reset     # Reset DB and re-seed
 ```
 
-## Build Phases
+## Screenshots
+_Add screenshots of: Front Desk dashboard, movement pass QR, resident detail, incident feed._
 
-| Phase | Description                                              | Status      |
-|-------|----------------------------------------------------------|-------------|
-| 1     | Project scaffold, database schema, seed data             | ✅ Complete |
-| 2     | Authentication with role-based access                    | ✅ Complete |
-| 3     | Resident management (CRUD, status tracking)              | ✅ Complete |
-| 4     | Employment authorization workflow                        | ✅ Complete |
-| 5     | Movement pass generation, QR codes, HMAC signing         | ✅ Complete |
-| 6     | QR code generation and pass delivery                     | ✅ Complete |
-| 7     | Front Desk dashboard with QR scanning & offline fallback | ✅ Complete |
-| 8     | Incident reporting (automatic and manual)                | ✅ Complete |
-| 9     | Reporting and analytics                                  | ✅ Complete |
-| 10    | Admin config, user management, notifications             | ✅ Complete |
-| 11    | Polish, accessibility audit, performance optimization    | Pending     |
+## Build Phases
+All core phases (1–10) complete. Phase 11 (polish, accessibility audit, performance) in progress.
+
+## License
+MIT
